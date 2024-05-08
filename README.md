@@ -6,7 +6,7 @@ This repository contains a Python application for analyzing sentiment in comment
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yousshaj/Hespress_Comments_Sentiment_Analysis.git
+   git clone https://github.com/yousshaj/Hespress_Comments_Sentiment_Analysis_with_python.git
 2. Navigate to the project directory:
     ```bash
     cd Hespress_Comments_Sentiment_Analysis
