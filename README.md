@@ -23,7 +23,7 @@ Run the main Python script:
     ```bash
     https://www.hespress.com/%d8%a2%d9%8a%d8%aa-%d8%b7%d8%a7%d9%84%d8%a8-%d9%87%d8%b0%d9%87-%d8%ad%d9%82%d9%8a%d9%82%d8%a9-%d8%a2%d8%ab%d8%a7%d8%b1-%d9%84%d9%82%d8%a7%d8%ad-%d8%a3%d8%b3%d8%aa%d8%b1%d8%a7%d8%b2%d9%8a%d9%86-1359601.html
 
-it may take sometime to do analyse , so don't give up on it
+it may take sometime to do analyse , so don't give up on it.
 if it doesn't work just check if you properly installed the required librarys
 
 
@@ -34,3 +34,6 @@ Contributions are welcome! If you find any bugs or have suggestions for improvem
 
 License
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+example of the app :
+![Alt text](example.png "Hespress Comments Sentiment Analysis with Python")
