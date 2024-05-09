@@ -59,6 +59,7 @@ def fetch_comments(url):
     user_name = []
     comment_text = []
     comment_date = []
+    likes = []  # Add a list to store the number of likes
 
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
     data = requests.get(url, headers=headers)  # Use the provided URL
@@ -102,13 +103,22 @@ def fetch_comments(url):
                 comment_date.append(pd.Timestamp(year, datetime.strptime(month, '%B').month, day, hour, minute))
             else:
                 comment_date.append('Unknown date')
+
+            # Extract number of likes
+            likes_span = li.find('span', class_='comment-recat-number')
+            if likes_span:
+                likes.append(int(likes_span.get_text()))
+            else:
+                likes.append(0)  # If no likes found, append 0
+
     else:
         print("No comments found on the page.")
 
     # Create DataFrame
-    df = pd.DataFrame({'User Name': user_name, 'Comment': comment_text, 'Date': comment_date})
+    df = pd.DataFrame({'User Name': user_name, 'Comment': comment_text, 'Date': comment_date, 'Likes': likes})
 
     return df, article_title
+
 
 
 
@@ -136,9 +146,9 @@ def analyze_sentiment(comment):
         compound_score = None
     
     # Adjust threshold values for sentiment labels
-    if compound_score >= 0.1:  # Adjusted threshold for positive sentiment
+    if compound_score >= 0.2:  # Adjusted threshold for positive sentiment
         return 'Positive', compound_score
-    elif compound_score <= -0.1:  # Adjusted threshold for negative sentiment
+    elif compound_score <= -0.2:  # Adjusted threshold for negative sentiment
         return 'Negative', compound_score
     else:
         return 'Neutral', compound_score
@@ -215,16 +225,17 @@ def display_comments(comments_df, article_title):
     stats_button.pack(side="left", padx=10)
 
     # Create Treeview widget to display comments
-    tree = ttk.Treeview(window, columns=["User Name", "Date", "Comment", "Sentiment", "Sentiment Score"], show="headings")
+    tree = ttk.Treeview(window, columns=["User Name", "Date", "Comment", "Sentiment", "Sentiment Score", "Likes"], show="headings")
     tree.heading("User Name", text="User Name")
     tree.heading("Date", text="Date")
     tree.heading("Comment", text="Comment")
     tree.heading("Sentiment", text="Sentiment")
     tree.heading("Sentiment Score", text="Sentiment Score")
+    tree.heading("Likes", text="Likes")  # Add a heading for Likes column
 
     # Insert comments into Treeview
     for _, row in comments_df.iterrows():
-        tree.insert("", "end", values=(row["User Name"], row["Date"], row["Comment"], row["Sentiment"], row["Sentiment Score"]))
+        tree.insert("", "end", values=(row["User Name"], row["Date"], row["Comment"], row["Sentiment"], row["Sentiment Score"], row["Likes"]))
 
     # Bind double click event to display full comment
     tree.bind("<Double-1>", lambda event: open_comment_window(tree.item(tree.focus())['values'][2]))
@@ -297,23 +308,42 @@ def create_bar_plot(stats_window, comments_df):
     plot_frame = tk.Frame(stats_window)
     plot_frame.pack()
 
-    # Create a bar plot to visualize sentiment distribution
+    # Calculate sentiment distribution
     sentiment_counts = comments_df['Sentiment'].value_counts()
-    plt.figure(figsize=(4, 3))
-    sns.barplot(x=sentiment_counts.index, y=sentiment_counts.values)
-    plt.title('Sentiment Distribution')
-    plt.xlabel('Sentiment')
-    plt.ylabel('Count')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-    plt.savefig('sentiment_distribution.png')
 
-    # Display the bar plot
-    plot_image = Image.open('sentiment_distribution.png')
+    # Create a pie chart to visualize sentiment distribution
+    plt.figure(figsize=(4, 3))
+    plt.pie(sentiment_counts, labels=sentiment_counts.index, autopct='%1.1f%%', startangle=140)
+    plt.title('Sentiment Distribution')
+    plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle
+    plt.tight_layout()
+    plt.savefig('sentiment_distribution_pie.png')
+
+    # Display the pie chart
+    plot_image = Image.open('sentiment_distribution_pie.png')
     plot_photo = ImageTk.PhotoImage(plot_image)
     plot_label = tk.Label(plot_frame, image=plot_photo)
     plot_label.image = plot_photo
     plot_label.grid(row=0, column=0, padx=10, pady=10)
+
+    # Create a bar plot to visualize the number of likes for each user
+    likes_per_user = comments_df.groupby('User Name')['Likes'].sum().reset_index()
+    plt.figure(figsize=(6, 4))
+
+    sns.barplot(x='User Name', y='Likes', data=likes_per_user)
+    plt.title('Likes per User')
+    plt.xlabel('User Name')
+    plt.ylabel('Number of Likes')
+    plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for better readability
+    plt.tight_layout()
+    plt.savefig('likes_per_user_bar.png')
+
+    # Display the bar plot
+    plot_image = Image.open('likes_per_user_bar.png')
+    plot_photo = ImageTk.PhotoImage(plot_image)
+    plot_label = tk.Label(plot_frame, image=plot_photo)
+    plot_label.image = plot_photo
+    plot_label.grid(row=1, column=0, padx=10, pady=10)
 
     # Create a line plot to visualize the number of comments over time
     comments_df['Date'] = pd.to_datetime(comments_df['Date'])
@@ -332,8 +362,7 @@ def create_bar_plot(stats_window, comments_df):
     plot_photo = ImageTk.PhotoImage(plot_image)
     plot_label = tk.Label(plot_frame, image=plot_photo)
     plot_label.image = plot_photo
-    plot_label.grid(row=1, column=0, padx=10, pady=10)
-
+    plot_label.grid(row=2, column=0, padx=10, pady=10)
 
 
 
