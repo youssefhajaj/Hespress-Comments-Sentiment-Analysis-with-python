@@ -36,10 +36,10 @@ License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 main app :
-![Alt text](main.png "Hespress Comments Sentiment Analysis with Python")
+![Alt text](/assets/main.png "Hespress Comments Sentiment Analysis with Python")
 comments section :
-![Alt text](comments.png "")
+![Alt text](/assets/comments.png "")
 statistics section :
-![Alt text](statistics.png "")
-![Alt text](statistics_2.png "")
+![Alt text](/assets/statistics.png "")
+![Alt text](/assets/statistics_2.png "")
 
