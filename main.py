@@ -180,7 +180,7 @@ def open_main_window():
     window_width = 800
     window_height = 400
 
-    image = Image.open("/assets/background_image.png")
+    image = Image.open("background_image.png")
     image = image.resize((window_width, window_height))
     photo = ImageTk.PhotoImage(image)
 
